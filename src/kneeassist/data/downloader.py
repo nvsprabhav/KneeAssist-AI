@@ -1,6 +1,7 @@
 from pathlib import Path
 import redivis
 from kneeassist.config import SAMPLE_DATA_DIR
+from kneeassist.config import RAW_DATA_DIR
 
 class MRNetDownloader:
     """
@@ -51,3 +52,49 @@ class MRNetDownloader:
         file.download(SAMPLE_DATA_DIR)
 
         print("✅ Download complete.")
+    def download_table(self, table_name: str, output_dir: Path):
+        """
+        Download all files from a Redivis table.
+        """
+
+        table = self.dataset.table(table_name)
+
+        files = table.list_files()
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        print(f"Downloading {len(files)} files to {output_dir}")
+
+        for i, file in enumerate(files, start=1):
+
+            destination = output_dir / file.name
+
+            if destination.exists():
+                print(f"[{i}/{len(files)}] Skipping {file.name}")
+                continue
+
+            print(f"[{i}/{len(files)}] Downloading {file.name}")
+
+            file.download(output_dir)
+
+        print("Download complete!")
+    def download_train(self):
+        self.download_table(
+            self.TRAIN_TABLE,
+            RAW_DATA_DIR / "train"
+        )
+
+
+    def download_validation(self):
+        self.download_table(
+            self.VALID_TABLE,
+            RAW_DATA_DIR / "validation"
+        )
+    def download_all(self):
+        """
+        Download the complete MRNet dataset.
+        """
+
+        self.download_train()
+        self.download_validation()
+        print("✅ All MRNet files downloaded.")

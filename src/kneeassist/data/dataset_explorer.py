@@ -2,6 +2,8 @@ from __future__ import annotations
 import redivis
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+from pathlib import Path
 
 class DatasetExplorer:
     """
@@ -169,3 +171,43 @@ class DatasetExplorer:
             self.train_abnormal_labels(),
             "Abnormal MRI Distribution (Training Set)"
         )
+    def analyze_slice_distribution(self, sample_dir: Path):
+        """
+        Analyze the number of slices in every MRI volume
+        contained in a directory.
+        """
+
+        npy_files = sorted(sample_dir.glob("*.npy"))
+
+        slice_counts = []
+
+        for file in npy_files:
+            volume = np.load(file)
+            slice_counts.append(volume.shape[0])
+
+        print("=" * 60)
+        print("MRI SLICE STATISTICS")
+        print("=" * 60)
+        print(f"Number of MRIs : {len(slice_counts)}")
+        print(f"Minimum Slices : {min(slice_counts)}")
+        print(f"Maximum Slices : {max(slice_counts)}")
+        print(f"Average Slices : {np.mean(slice_counts):.2f}")
+        print(f"Median Slices  : {np.median(slice_counts)}")
+        print("=" * 60)
+
+        return slice_counts
+    def plot_slice_distribution(self, slice_counts):
+        """
+        Plot the distribution of MRI slice counts.
+        """
+
+        plt.figure(figsize=(8,5))
+
+        plt.hist(slice_counts, bins=20)
+
+        plt.title("Distribution of MRI Slice Counts")
+        plt.xlabel("Number of Slices")
+        plt.ylabel("Number of MRI Volumes")
+
+        plt.tight_layout()
+        plt.show()

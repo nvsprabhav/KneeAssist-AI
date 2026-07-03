@@ -1,12 +1,5 @@
 from kneeassist.data.downloader import MRNetDownloader
 
+downloader = MRNetDownloader()
 
-def main():
-
-    downloader = MRNetDownloader()
-
-    downloader.download_sample()
-
-
-if __name__ == "__main__":
-    main()
+downloader.download_all()
